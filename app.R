@@ -184,8 +184,13 @@ observeEvent(input[["nav"]], {
     }
 }, ignoreInit = TRUE)
 
-telemetry$log_input(input$selected_vehicle, "vehicle_selection")
-telemetry$log_input(input$predict_btn, "prediction_request")
+observeEvent(input$selected_vehicle, {
+    telemetry$log_custom_event(paste0("vehicle_selection: ", input$selected_vehicle))
+}, ignoreInit = TRUE)
+
+observeEvent(input$predict_btn, {
+    telemetry$log_custom_event("prediction_request")
+}, ignoreInit = TRUE)
 
 output$health_distribution <- renderPlotly({
     p <- vehicle_health |>
