@@ -197,10 +197,10 @@ output$health_distribution <- renderPlotly({
     ggplot(aes(x = health_score, fill = failure_risk)) +
     geom_histogram(binwidth = 5, color = "white") +
     scale_fill_manual(values = c(
-        "Low" = "#2ECC71",
-        "Medium" = "#F39C12",
-        "High" = "#E74C3C",
-        "Critical" = "#8E44AD"
+        "Low" = "#00A651",
+        "Medium" = "#FFB81C",
+        "High" = "#DC3545",
+        "Critical" = "#2D2A54"
     )) +
     labs(x = "Health Score", y = "Count", fill = "Risk") +
     theme_minimal()
@@ -214,7 +214,7 @@ output$maintenance_by_component <- renderPlotly({
     ggplot(aes(x = reorder(component, n), y = n, fill = n)) +
     geom_col() +
     coord_flip() +
-    scale_fill_gradient(low = "#BBE1FA", high = "#0F4C75") +
+    scale_fill_gradient(low = "#FFB3D1", high = "#E6007E") +
     labs(x = NULL, y = "Events") +
     theme_minimal() +
     theme(legend.position = "none")
@@ -272,12 +272,12 @@ output$vehicle_gauges <- renderPlotly({
     title = list(text = "Health Score"),
     gauge = list(
         axis = list(range = list(0, 100)),
-        bar = list(color = "#0F4C75"),
+        bar = list(color = "#E6007E"),
         steps = list(
-        list(range = c(0, 40), color = "#E74C3C"),
-        list(range = c(40, 60), color = "#F39C12"),
-        list(range = c(60, 80), color = "#3498DB"),
-        list(range = c(80, 100), color = "#2ECC71")
+        list(range = c(0, 40), color = "#DC3545"),
+        list(range = c(40, 60), color = "#FFB81C"),
+        list(range = c(60, 80), color = "#6E6AAF"),
+        list(range = c(80, 100), color = "#00A651")
         )
     )
     ) |>
@@ -345,7 +345,7 @@ output$prediction_result <- renderUI({
     risk_prob <- pred$.pred_TRUE
     risk_class <- pred$.pred_class
 
-    risk_color <- if (risk_class == TRUE) "#E74C3C" else "#2ECC71"
+    risk_color <- if (risk_class == TRUE) "#DC3545" else "#00A651"
     risk_label <- if (risk_class == TRUE) "HIGH RISK" else "LOW RISK"
 
     tagList(
@@ -383,7 +383,7 @@ output$feature_importance <- renderPlotly({
     y = reorder(names(importance), importance),
     type = "bar",
     orientation = "h",
-    marker = list(color = "#0F4C75")
+    marker = list(color = "#E6007E")
     ) |>
     layout(
         xaxis = list(title = "Importance"),

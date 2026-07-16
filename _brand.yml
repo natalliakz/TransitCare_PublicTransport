@@ -8,32 +8,35 @@ meta:
 color:
   palette:
     white: "#FFFFFF"
-    black: "#1A1A2E"
-    navy: "#16213E"
-    blue: "#0F4C75"
-    teal: "#3282B8"
-    light-blue: "#BBE1FA"
-    green: "#2ECC71"
-    orange: "#E67E22"
-    red: "#E74C3C"
+    black: "#1E1E1E"
+    magenta: "#E6007E"
+    dark-purple: "#2D2A54"
+    purple: "#4A4687"
+    light-purple: "#6E6AAF"
+    pink: "#FF4D94"
+    light-pink: "#FFB3D1"
+    green: "#00A651"
+    amber: "#FFB81C"
+    red: "#DC3545"
     grey: "#6C757D"
+    light-grey: "#F5F5F5"
 
   foreground: black
   background: white
-  primary: blue
-  secondary: grey
+  primary: magenta
+  secondary: dark-purple
   success: green
-  info: teal
-  warning: orange
+  info: purple
+  warning: amber
   danger: red
-  light: light-blue
-  dark: navy
+  light: light-grey
+  dark: dark-purple
 
 typography:
   fonts:
-    - family: Inter
+    - family: Open Sans
       source: google
-      weight: [400, 500, 600, 700]
+      weight: [400, 600, 700]
       style: [normal]
     - family: JetBrains Mono
       source: google
@@ -41,16 +44,16 @@ typography:
       style: [normal]
 
   base:
-    family: Inter
+    family: Open Sans
     weight: 400
     size: 16px
     line-height: 1.5
 
   headings:
-    family: Inter
-    weight: 600
+    family: Open Sans
+    weight: 700
     line-height: 1.2
-    color: navy
+    color: dark-purple
 
   monospace:
     family: JetBrains Mono
