@@ -1,0 +1,61 @@
+meta:
+  name:
+    short: TransitCare
+    full: TransitCare Fleet Solutions
+  link:
+    home: https://www.transitcare-demo.example.com
+
+color:
+  palette:
+    white: "#FFFFFF"
+    black: "#1E1E1E"
+    magenta: "#E6007E"
+    dark-purple: "#2D2A54"
+    purple: "#4A4687"
+    light-purple: "#6E6AAF"
+    pink: "#FF4D94"
+    light-pink: "#FFB3D1"
+    green: "#00A651"
+    amber: "#FFB81C"
+    red: "#DC3545"
+    grey: "#6C757D"
+    light-grey: "#F5F5F5"
+
+  foreground: black
+  background: white
+  primary: magenta
+  secondary: dark-purple
+  success: green
+  info: purple
+  warning: amber
+  danger: red
+  light: light-grey
+  dark: dark-purple
+
+typography:
+  fonts:
+    - family: Open Sans
+      source: google
+      weight: [400, 600, 700]
+      style: [normal]
+    - family: JetBrains Mono
+      source: google
+      weight: [400, 500]
+      style: [normal]
+
+  base:
+    family: Open Sans
+    weight: 400
+    size: 16px
+    line-height: 1.5
+
+  headings:
+    family: Open Sans
+    weight: 700
+    line-height: 1.2
+    color: dark-purple
+
+  monospace:
+    family: JetBrains Mono
+    weight: 400
+    size: 0.9em
