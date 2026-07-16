@@ -1,0 +1,58 @@
+meta:
+  name:
+    short: TransitCare
+    full: TransitCare Fleet Solutions
+  link:
+    home: https://www.transitcare-demo.example.com
+
+color:
+  palette:
+    white: "#FFFFFF"
+    black: "#1A1A2E"
+    navy: "#16213E"
+    blue: "#0F4C75"
+    teal: "#3282B8"
+    light-blue: "#BBE1FA"
+    green: "#2ECC71"
+    orange: "#E67E22"
+    red: "#E74C3C"
+    grey: "#6C757D"
+
+  foreground: black
+  background: white
+  primary: blue
+  secondary: grey
+  success: green
+  info: teal
+  warning: orange
+  danger: red
+  light: light-blue
+  dark: navy
+
+typography:
+  fonts:
+    - family: Inter
+      source: google
+      weight: [400, 500, 600, 700]
+      style: [normal]
+    - family: JetBrains Mono
+      source: google
+      weight: [400, 500]
+      style: [normal]
+
+  base:
+    family: Inter
+    weight: 400
+    size: 16px
+    line-height: 1.5
+
+  headings:
+    family: Inter
+    weight: 600
+    line-height: 1.2
+    color: navy
+
+  monospace:
+    family: JetBrains Mono
+    weight: 400
+    size: 0.9em

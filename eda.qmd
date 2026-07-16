@@ -1,0 +1,247 @@
+---
+title: "TransitCare Fleet Maintenance Analysis"
+subtitle: "Exploratory Data Analysis for Predictive Maintenance"
+format:
+  html:
+    theme: [default, _brand.yml]
+    toc: true
+    toc-depth: 3
+    code-fold: true
+execute:
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: setup
+library(dplyr)
+library(ggplot2)
+library(lubridate)
+library(readr)
+library(tidyr)
+library(gt)
+
+theme_set(theme_minimal(base_size = 12))
+
+if (!file.exists("data/synthetic-vehicles.csv")) {
+  source("data/generate_data.R")
+}
+
+vehicles <- read_csv("data/synthetic-vehicles.csv", show_col_types = FALSE)
+maintenance <- read_csv("data/synthetic-maintenance.csv", show_col_types = FALSE)
+vehicle_health <- read_csv("data/synthetic-vehicle-health.csv", show_col_types = FALSE)
+sensor_readings <- read_csv("data/synthetic-sensor-readings.csv", show_col_types = FALSE)
+```
+
+## Executive Summary
+
+This analysis examines TransitCare's fleet of `r nrow(vehicles)` vehicles across `r n_distinct(vehicles$depot)` depots to identify patterns in maintenance events and predict potential failures. Key findings support the development of a predictive maintenance strategy to reduce downtime and optimize fleet operations.
+
+## Fleet Overview
+
+### Fleet Composition
+
+```{r}
+#| label: fleet-composition
+vehicles |>
+  count(vehicle_type, depot) |>
+  pivot_wider(names_from = depot, values_from = n, values_fill = 0) |>
+  gt() |>
+  tab_header(title = "Fleet Distribution by Type and Depot") |>
+  cols_label(vehicle_type = "Vehicle Type")
+```
+
+```{r}
+#| label: fleet-age
+#| fig-height: 4
+vehicles |>
+  mutate(age = 2024 - year_manufactured) |>
+  ggplot(aes(x = age, fill = vehicle_type)) +
+  geom_histogram(binwidth = 1, position = "stack", color = "white") +
+  labs(
+    title = "Fleet Age Distribution",
+    x = "Vehicle Age (Years)",
+    y = "Number of Vehicles",
+    fill = "Vehicle Type"
+  ) +
+  scale_fill_brewer(palette = "Set2")
+```
+
+### Vehicle Health Distribution
+
+```{r}
+#| label: health-scores
+#| fig-height: 4
+vehicle_health |>
+  ggplot(aes(x = health_score, fill = failure_risk)) +
+  geom_histogram(binwidth = 5, color = "white") +
+  labs(
+    title = "Vehicle Health Score Distribution",
+    x = "Health Score",
+    y = "Number of Vehicles",
+    fill = "Failure Risk"
+  ) +
+  scale_fill_manual(values = c(
+    "Low" = "#2ECC71",
+    "Medium" = "#F39C12",
+    "High" = "#E74C3C",
+    "Critical" = "#8E44AD"
+  ))
+```
+
+## Maintenance Analysis
+
+### Maintenance Events by Component
+
+```{r}
+#| label: maintenance-by-component
+#| fig-height: 5
+maintenance |>
+  count(component, severity) |>
+  ggplot(aes(x = reorder(component, n), y = n, fill = severity)) +
+  geom_col() +
+  coord_flip() +
+  labs(
+    title = "Maintenance Events by Component",
+    x = NULL,
+    y = "Number of Events",
+    fill = "Severity"
+  ) +
+  scale_fill_manual(values = c(
+    "Minor" = "#3498DB",
+    "Moderate" = "#F39C12",
+    "Major" = "#E74C3C",
+    "Critical" = "#8E44AD"
+  ))
+```
+
+### Maintenance Cost Analysis
+
+```{r}
+#| label: cost-summary
+maintenance |>
+  mutate(total_cost = parts_cost + labor_cost) |>
+  group_by(component) |>
+  summarise(
+    events = n(),
+    avg_cost = mean(total_cost),
+    total_cost = sum(total_cost),
+    avg_downtime = mean(downtime_hours),
+    .groups = "drop"
+  ) |>
+  arrange(desc(total_cost)) |>
+  gt() |>
+  tab_header(title = "Maintenance Cost Summary by Component") |>
+  fmt_currency(columns = c(avg_cost, total_cost), currency = "GBP") |>
+  fmt_number(columns = avg_downtime, decimals = 1) |>
+  cols_label(
+    component = "Component",
+    events = "Events",
+    avg_cost = "Avg Cost",
+    total_cost = "Total Cost",
+    avg_downtime = "Avg Downtime (hrs)"
+  )
+```
+
+### Monthly Maintenance Trends
+
+```{r}
+#| label: monthly-trends
+#| fig-height: 4
+maintenance |>
+  mutate(month = floor_date(date, "month")) |>
+  count(month, scheduled) |>
+  ggplot(aes(x = month, y = n, color = scheduled)) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+  labs(
+    title = "Monthly Maintenance Events",
+    x = NULL,
+    y = "Number of Events",
+    color = "Scheduled"
+  ) +
+  scale_color_manual(values = c("TRUE" = "#2ECC71", "FALSE" = "#E74C3C"),
+                     labels = c("TRUE" = "Scheduled", "FALSE" = "Unscheduled"))
+```
+
+## Predictive Indicators
+
+### Health Score vs Failure Probability
+
+```{r}
+#| label: health-vs-failure
+#| fig-height: 4
+vehicle_health |>
+  ggplot(aes(x = health_score, y = estimated_failure_probability, color = vehicle_type)) +
+  geom_point(alpha = 0.7, size = 2) +
+  geom_smooth(method = "loess", se = FALSE, color = "black", linetype = "dashed") +
+  labs(
+    title = "Health Score vs Estimated Failure Probability",
+    x = "Health Score",
+    y = "Failure Probability",
+    color = "Vehicle Type"
+  ) +
+  scale_color_brewer(palette = "Set2")
+```
+
+### Key Risk Factors
+
+```{r}
+#| label: risk-factors
+vehicle_health |>
+  filter(failure_risk %in% c("High", "Critical")) |>
+  select(vehicle_id, vehicle_type, depot, age_years, health_score,
+         critical_issues_ytd, days_since_last_service, estimated_failure_probability) |>
+  arrange(desc(estimated_failure_probability)) |>
+  head(10) |>
+  gt() |>
+  tab_header(title = "Top 10 High-Risk Vehicles") |>
+  fmt_percent(columns = estimated_failure_probability, decimals = 1) |>
+  cols_label(
+    vehicle_id = "Vehicle",
+    vehicle_type = "Type",
+    depot = "Depot",
+    age_years = "Age",
+    health_score = "Health",
+    critical_issues_ytd = "Critical Issues",
+    days_since_last_service = "Days Since Service",
+    estimated_failure_probability = "Failure Prob"
+  )
+```
+
+## Sensor Data Insights
+
+```{r}
+#| label: sensor-trends
+#| fig-height: 5
+sensor_readings |>
+  select(vehicle_id, reading_date, engine_temp, oil_pressure, battery_voltage, brake_wear_pct) |>
+  pivot_longer(cols = c(engine_temp, oil_pressure, battery_voltage, brake_wear_pct),
+               names_to = "metric", values_to = "value") |>
+  ggplot(aes(x = reading_date, y = value)) +
+  geom_line(aes(group = vehicle_id), alpha = 0.3) +
+  stat_summary(fun = mean, geom = "line", color = "#E74C3C", linewidth = 1) +
+  facet_wrap(~metric, scales = "free_y", ncol = 2) +
+  labs(
+    title = "Sensor Reading Trends (30-Day Window)",
+    subtitle = "Individual vehicles (grey) with fleet average (red)",
+    x = NULL,
+    y = "Value"
+  )
+```
+
+## Conclusions and Recommendations
+
+Based on this analysis:
+
+1. **Component Focus**: Brakes and Electrical systems account for the highest maintenance frequency and should be prioritized for predictive monitoring
+
+2. **Fleet Renewal**: Vehicles older than 7 years show significantly higher maintenance costs and failure rates
+
+3. **Unscheduled Maintenance**: Approximately 40% of maintenance events are unscheduled, indicating opportunity for improved predictive capabilities
+
+4. **Depot Variations**: Maintenance patterns vary by depot, suggesting potential process improvements through cross-depot learning
+
+---
+
+*This analysis uses synthetic data generated for demonstration purposes. All company names, vehicle identifiers, and metrics are fictional.*

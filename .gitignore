@@ -1,0 +1,48 @@
+# R Environment
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+renv/
+.Rprofile
+
+# Quarto
+.quarto/
+/_site/
+*.html
+
+# Shiny
+rsconnect/
+
+# IDE files
+.vscode/
+.idea/
+*.sublime-*
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs and temp files
+*.log
+*.tmp
+*.temp
+
+# Synthetic data (regenerate with data/generate_data.R)
+data/*.csv
+
+# Model artifacts (regenerate with ml/train_model.R)
+ml/*.rds
+
+# Telemetry database (generated at runtime)
+*.sqlite
+telemetry.db
+
+# Application logs
+*.log
+app.log
